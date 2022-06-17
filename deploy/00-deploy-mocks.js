@@ -8,9 +8,8 @@ const {
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy, log } = deployments;
   const { deployer } = await getNamedAccounts();
-  const { chainId } = network.config;
 
-  if (developmentChains.includes(chainId)) {
+  if (developmentChains.includes(network.name)) {
     log("Local network detected, deploying mocks...");
     await deploy("MockV3Aggregator", {
       contract: "MockV3Aggregator",
@@ -22,3 +21,5 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log("----------------------------------------------------");
   }
 };
+
+module.exports.tags = ["all", "mocks"];
