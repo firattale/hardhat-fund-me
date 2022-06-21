@@ -14,7 +14,7 @@ describe("FundMe", () => {
 
   describe("constructor", () => {
     it("should set the aggregator address correctly", async () => {
-      const aggregatorAddress = await fundMe.s_priceFeed();
+      const aggregatorAddress = await fundMe.getPriceFeed();
       assert.equal(aggregatorAddress, mockV3Aggregator.address);
     });
   });
@@ -27,12 +27,12 @@ describe("FundMe", () => {
     });
     it("should update the funded amount data structure", async () => {
       await fundMe.fund({ value: sendValue });
-      const fundedAmount = await fundMe.s_addressToAmountFunded(deployer);
+      const fundedAmount = await fundMe.getFunderAmount(deployer);
       assert.equal(fundedAmount.toString(), sendValue.toString());
     });
     it("should add funder to funders array", async () => {
       await fundMe.fund({ value: sendValue });
-      const funder = await fundMe.s_funders("0");
+      const funder = await fundMe.getFunder("0");
       assert.equal(funder, deployer);
     });
   });
@@ -123,12 +123,9 @@ describe("FundMe", () => {
         endingDeployerBalance.add(gasCost).toString()
       );
       // Make sure that the funders are reset properly
-      await expect(fundMe.s_funders(0)).to.be.reverted;
+      await expect(fundMe.getFunder(0)).to.be.reverted;
       for (let i = 1; i < 6; i++) {
-        assert.equal(
-          await fundMe.s_addressToAmountFunded(accounts[i].address),
-          0
-        );
+        assert.equal(await fundMe.getFunderAmount(accounts[i].address), 0);
       }
     });
     it("cheaper withdraw multiple users... ", async () => {
@@ -164,12 +161,9 @@ describe("FundMe", () => {
         endingDeployerBalance.add(gasCost).toString()
       );
       // Make sure that the funders are reset properly
-      await expect(fundMe.s_funders(0)).to.be.reverted;
+      await expect(fundMe.getFunder(0)).to.be.reverted;
       for (let i = 1; i < 6; i++) {
-        assert.equal(
-          await fundMe.s_addressToAmountFunded(accounts[i].address),
-          0
-        );
+        assert.equal(await fundMe.getFunderAmount(accounts[i].address), 0);
       }
     });
     it("should only allow the owner to withdraw", async () => {
